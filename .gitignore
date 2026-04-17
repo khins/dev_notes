@@ -20,6 +20,11 @@ env/
 !.vscode/settings.json
 
 # ----------------------
+# Local tooling
+# ----------------------
+.codex
+
+# ----------------------
 # Environment variables
 # ----------------------
 .env
