@@ -103,3 +103,44 @@ def add_note_with_topics(language: str, title: str, content: str, topics: list[s
         link_note_topic(note_id, topic_id)
 
     return note_id
+
+def get_note_with_topics(note_id: int):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT n.id, n.language, n.topic, n.content,
+               STRING_AGG(t.name, ', ') as topics
+        FROM notes n
+        LEFT JOIN note_topics nt ON n.id = nt.note_id
+        LEFT JOIN topics t ON t.id = nt.topic_id
+        WHERE n.id = %s
+        GROUP BY n.id
+        """,
+        (note_id,)
+    )
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+    return row
+
+def display_note(note):
+    if not note:
+        print("❌ Note not found")
+        return
+
+    note_id, language, topic, content, topics = note
+
+    print("\n" + "="*30)
+    print(f"ID: {note_id}")
+    print(f"Language: {language}")
+    print(f"Topic: {topic}")
+
+    print("\nContent:")
+    print(content)  # 👈 this preserves line breaks!
+
+    print("\nTopics:", topics if topics else "None")
+    print("="*30 + "\n")

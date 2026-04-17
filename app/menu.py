@@ -2,8 +2,9 @@ from app.models import add_note
 from app.models import (
     add_note_with_topics,
     get_all_notes,
-    get_note,
-    update_note
+    get_note_with_topics,
+    update_note,
+    display_note
 )
 
 def show_menu():
@@ -48,8 +49,8 @@ def handle_choice(choice: str):
 
     elif choice == "3":
         note_id = int(input("Enter note ID: "))
-        note = get_note(note_id)
-        print(note)
+        note = get_note_with_topics(note_id)
+        display_note(note)
 
     elif choice == "4":
         note_id = int(input("Enter note ID: "))
