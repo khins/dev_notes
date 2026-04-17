@@ -54,7 +54,15 @@ def handle_choice(choice: str):
 
     elif choice == "4":
         note_id = int(input("Enter note ID: "))
-        content = input("New content: ")
+        print("Enter new content (type 'END' on a new line to finish):")
+        lines = []
+        while True:
+            line = input()
+            if line.strip() == "END":
+                break
+            lines.append(line)
+
+        content = "\n".join(lines)
         update_note(note_id, content)
         print("✏️ Note updated.")
 
