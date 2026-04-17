@@ -15,13 +15,16 @@ env/
 # ----------------------
 # VS Code
 # ----------------------
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
 
 # ----------------------
 # Environment variables
 # ----------------------
 .env
 .env.*
+!.env.example
 
 # ----------------------
 # Logs

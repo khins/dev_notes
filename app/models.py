@@ -9,13 +9,16 @@ def add_note(language: str, topic: str, content: str):
         """
         INSERT INTO notes (language, topic, content)
         VALUES (%s, %s, %s)
+        RETURNING id
         """,
         (language, topic, content)
     )
+    note_id = cur.fetchone()[0]
 
     conn.commit()
     cur.close()
     conn.close()
+    return note_id
 
 
 def get_all_notes():
