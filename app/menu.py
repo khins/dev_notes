@@ -1,5 +1,10 @@
-from app.models import add_note, get_all_notes, get_note, update_note
-
+from app.models import add_note
+from app.models import (
+    add_note_with_topics,
+    get_all_notes,
+    get_note,
+    update_note
+)
 
 def show_menu():
     print("\n=== Dev Notes CLI ===")
@@ -13,11 +18,28 @@ def show_menu():
 def handle_choice(choice: str):
     if choice == "1":
         language = input("Language: ")
-        topic = input("Topic: ")
-        content = input("Content: ")
+        title = input("Title: ")
 
-        add_note(language, topic, content)
-        print("✅ Note added.")
+        print("Enter content (type 'END' on a new line to finish):")
+        lines = []
+        while True:
+            line = input()
+            if line.strip() == "END":
+                break
+            lines.append(line)
+
+        content = "\n".join(lines)
+
+        topics_input = input("Topics (comma separated): ")
+
+        if topics_input.strip():
+            topics = [t.strip().lower() for t in topics_input.split(",") if t.strip()]
+        else:
+            topics = []
+
+        note_id = add_note_with_topics(language, title, content, topics)
+
+        print(f"✅ Note added with ID {note_id}")
 
     elif choice == "2":
         notes = get_all_notes()
