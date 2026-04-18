@@ -1,3 +1,5 @@
+import os
+
 from app.models import add_note
 from app.models import (
     add_note_with_topics,
@@ -7,13 +9,19 @@ from app.models import (
     display_note
 )
 
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def show_menu():
     print("\n=== Dev Notes CLI ===")
     print("1. Add Note")
     print("2. View All Notes")
     print("3. View Note by ID")
     print("4. Update Note")
-    print("5. Exit")
+    print("5. Clear Screen")
+    print("6. Exit")
 
 
 def handle_choice(choice: str):
@@ -67,6 +75,9 @@ def handle_choice(choice: str):
         print("✏️ Note updated.")
 
     elif choice == "5":
+        clear_screen()
+
+    elif choice == "6":
         print("Goodbye 👋")
         exit()
 
