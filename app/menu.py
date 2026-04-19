@@ -3,6 +3,7 @@ import os
 from app.models import add_note
 from app.models import (
     add_note_with_topics,
+    delete_note,
     get_all_notes,
     get_note_with_topics,
     update_note,
@@ -20,8 +21,9 @@ def show_menu():
     print("2. View All Notes")
     print("3. View Note by ID")
     print("4. Update Note")
-    print("5. Clear Screen")
-    print("6. Exit")
+    print("5. Delete Note by ID")
+    print("6. Clear Screen")
+    print("7. Exit")
 
 
 def handle_choice(choice: str):
@@ -75,9 +77,18 @@ def handle_choice(choice: str):
         print("✏️ Note updated.")
 
     elif choice == "5":
-        clear_screen()
+        note_id = int(input("Enter note ID to delete: "))
+        deleted = delete_note(note_id)
+
+        if deleted:
+            print(f"🗑️ Note {note_id} deleted.")
+        else:
+            print("❌ Note not found.")
 
     elif choice == "6":
+        clear_screen()
+
+    elif choice == "7":
         print("Goodbye 👋")
         exit()
 

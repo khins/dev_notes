@@ -58,6 +58,20 @@ def update_note(note_id: int, content: str):
     cur.close()
     conn.close()
 
+
+def delete_note(note_id: int) -> bool:
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM notes WHERE id = %s RETURNING id", (note_id,))
+    deleted_row = cur.fetchone()
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return deleted_row is not None
+
+
 def get_or_create_topic(name: str) -> int:
     conn = get_connection()
     cur = conn.cursor()
