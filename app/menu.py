@@ -1,10 +1,10 @@
 import os
 
-from app.models import add_note
 from app.models import (
     add_note_with_topics,
     delete_note,
     get_all_notes,
+    get_all_topics,
     get_note_with_topics,
     update_note,
     display_note
@@ -26,6 +26,42 @@ def show_menu():
     print("7. Exit")
 
 
+def prompt_for_topic_selection():
+    topics = get_all_topics()
+
+    if not topics:
+        print("No saved topics are available yet. This note will be added without linked topics.")
+        return []
+
+    print("\nAvailable topics:")
+    for index, (_, name) in enumerate(topics, start=1):
+        print(f"{index}. {name}")
+
+    while True:
+        selection = input("Select topic numbers (comma separated), or press Enter for none: ").strip()
+
+        if not selection:
+            return []
+
+        try:
+            selected_indexes = []
+            for part in selection.split(","):
+                topic_index = int(part.strip())
+                if topic_index < 1 or topic_index > len(topics):
+                    raise ValueError
+                selected_indexes.append(topic_index)
+        except ValueError:
+            print("Invalid selection. Please enter only numbers from the list, separated by commas.")
+            continue
+
+        unique_indexes = []
+        for topic_index in selected_indexes:
+            if topic_index not in unique_indexes:
+                unique_indexes.append(topic_index)
+
+        return [topics[index - 1][1] for index in unique_indexes]
+
+
 def handle_choice(choice: str):
     if choice == "1":
         language = input("Language: ")
@@ -41,12 +77,7 @@ def handle_choice(choice: str):
 
         content = "\n".join(lines)
 
-        topics_input = input("Topics (comma separated): ")
-
-        if topics_input.strip():
-            topics = [t.strip().lower() for t in topics_input.split(",") if t.strip()]
-        else:
-            topics = []
+        topics = prompt_for_topic_selection()
 
         note_id = add_note_with_topics(language, title, content, topics)
 

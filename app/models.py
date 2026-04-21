@@ -94,6 +94,18 @@ def get_or_create_topic(name: str) -> int:
     conn.close()
     return topic_id
 
+
+def get_all_topics():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT id, name FROM topics ORDER BY name")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+    return rows
+
 def link_note_topic(note_id: int, topic_id: int):
     conn = get_connection()
     cur = conn.cursor()
