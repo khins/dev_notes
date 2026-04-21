@@ -1,7 +1,12 @@
+CREATE TABLE languages (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
 CREATE TABLE notes (
     id SERIAL PRIMARY KEY,
-    language VARCHAR(50),
-    topic VARCHAR(100),
+    language_id INT REFERENCES languages(id),
+    title VARCHAR(100),
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -18,6 +18,45 @@
 
 The app loads environment variables from `.env` automatically.
 
+## Database Notes
+
+If your database was created before the `title` rename, run this once:
+
+`ALTER TABLE notes RENAME COLUMN topic TO title;`
+
+If your database was created before the `languages` table was added, run this:
+
+```sql
+CREATE TABLE languages (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+INSERT INTO languages (name) VALUES
+('Python'),
+('JavaScript'),
+('SQL');
+```
+
+If your database already has a `notes.language` text column and you want to normalize it to `language_id`, run this:
+
+```sql
+INSERT INTO languages (name)
+SELECT DISTINCT language
+FROM notes
+WHERE language IS NOT NULL
+ON CONFLICT (name) DO NOTHING;
+
+ALTER TABLE notes ADD COLUMN language_id INT REFERENCES languages(id);
+
+UPDATE notes n
+SET language_id = l.id
+FROM languages l
+WHERE n.language = l.name;
+
+ALTER TABLE notes DROP COLUMN language;
+```
+
 ## VS Code
 
 This project includes VS Code settings and a debugger launch config.

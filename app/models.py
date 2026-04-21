@@ -1,17 +1,17 @@
 from app.db import get_connection
 
 
-def add_note(language: str, topic: str, content: str):
+def add_note(language_id: int, title: str, content: str):
     conn = get_connection()
     cur = conn.cursor()
 
     cur.execute(
         """
-        INSERT INTO notes (language, topic, content)
+        INSERT INTO notes (language_id, title, content)
         VALUES (%s, %s, %s)
         RETURNING id
         """,
-        (language, topic, content)
+        (language_id, title, content)
     )
     note_id = cur.fetchone()[0]
 
@@ -25,7 +25,14 @@ def get_all_notes():
     conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT id, language, topic FROM notes ORDER BY id")
+    cur.execute(
+        """
+        SELECT n.id, l.name, n.title
+        FROM notes n
+        JOIN languages l ON l.id = n.language_id
+        ORDER BY n.id
+        """
+    )
     rows = cur.fetchall()
 
     cur.close()
@@ -95,6 +102,18 @@ def get_or_create_topic(name: str) -> int:
     return topic_id
 
 
+def get_all_languages():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT id, name FROM languages ORDER BY name")
+    rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+    return rows
+
+
 def get_all_topics():
     conn = get_connection()
     cur = conn.cursor()
@@ -123,8 +142,8 @@ def link_note_topic(note_id: int, topic_id: int):
     cur.close()
     conn.close()
 
-def add_note_with_topics(language: str, title: str, content: str, topics: list[str]):
-    note_id = add_note(language, title, content)
+def add_note_with_topics(language_id: int, title: str, content: str, topics: list[str]):
+    note_id = add_note(language_id, title, content)
 
     for topic in topics:
         topic_clean = topic.strip().lower()
@@ -139,13 +158,14 @@ def get_note_with_topics(note_id: int):
 
     cur.execute(
         """
-        SELECT n.id, n.language, n.topic, n.content,
+        SELECT n.id, l.name, n.title, n.content,
                STRING_AGG(t.name, ', ') as topics
         FROM notes n
+        JOIN languages l ON l.id = n.language_id
         LEFT JOIN note_topics nt ON n.id = nt.note_id
         LEFT JOIN topics t ON t.id = nt.topic_id
         WHERE n.id = %s
-        GROUP BY n.id
+        GROUP BY n.id, l.name
         """,
         (note_id,)
     )
@@ -161,12 +181,12 @@ def display_note(note):
         print("❌ Note not found")
         return
 
-    note_id, language, topic, content, topics = note
+    note_id, language, title, content, topics = note
 
     print("\n" + "="*30)
     print(f"ID: {note_id}")
     print(f"Language: {language}")
-    print(f"Topic: {topic}")
+    print(f"Title: {title}")
 
     print("\nContent:")
     print(content)  # 👈 this preserves line breaks!

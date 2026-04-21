@@ -3,6 +3,7 @@ import os
 from app.models import (
     add_note_with_topics,
     delete_note,
+    get_all_languages,
     get_all_notes,
     get_all_topics,
     get_note_with_topics,
@@ -24,6 +25,31 @@ def show_menu():
     print("5. Delete Note by ID")
     print("6. Clear Screen")
     print("7. Exit")
+
+
+def prompt_for_language_selection():
+    languages = get_all_languages()
+
+    if not languages:
+        print("No saved languages are available yet. Add languages to the database first.")
+        return None
+
+    print("\nAvailable languages:")
+    for index, (_, name) in enumerate(languages, start=1):
+        print(f"{index}. {name}")
+
+    while True:
+        selection = input("Select a language number: ").strip()
+
+        try:
+            language_index = int(selection)
+            if language_index < 1 or language_index > len(languages):
+                raise ValueError
+        except ValueError:
+            print("Invalid selection. Please enter one number from the list.")
+            continue
+
+        return languages[language_index - 1][0]
 
 
 def prompt_for_topic_selection():
@@ -64,7 +90,10 @@ def prompt_for_topic_selection():
 
 def handle_choice(choice: str):
     if choice == "1":
-        language = input("Language: ")
+        language = prompt_for_language_selection()
+        if language is None:
+            return
+
         title = input("Title: ")
 
         print("Enter content (type 'END' on a new line to finish):")
